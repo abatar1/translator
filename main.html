@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            html, body { height: 100%; padding: 0; margin: 0; }
+            .upperContainer { width: 50%; height: 10%; float: left; }
+            .downContainer { width: 50%; height: 60%; float: left; }
+            .downContainer .textBox { resize: none; outline: none; width: 90%; padding: 10px; height: 90%; }
+        </style>
+        <script type="text/javascript" src="YandexTranslator.js"></script>
+        <script type="text/javascript" src="Helper.js"></script>
+        <title>Translator</title>
+    </head>
+    <body>  
+        <div class="upperContainer">
+            <select name="inputLanguageComboBox" id="inputLanguageComboBox"></select>
+            <input id="determineButton" type="button" value="Determine the language"></input>
+        </div>
+
+        <div class="upperContainer">
+            <select name="outputLanguageComboBox" id="outputLanguageComboBox"></select>       
+            <input id="translateButton" type="button" value="Translate"></input>
+        </div>
+
+        <div class="downContainer">
+            <textarea class="textBox" id="inputTextArea"></textarea>
+        </div> 
+
+        <div class="downContainer">
+            <textarea class="textBox" id="outputTextArea"></textarea>
+        </div>
+
+        <output id="messageTextArea"></output>
+
+        <script type="text/javascript">
+            var translator = new YandexTranslator();
+            var helper = new Helper();
+
+            if (translator.apiKey == "") helper.setApiKey();
+
+            translator.getSupportedLanguages(function(result)
+            {   
+                inputLanguageComboBox.innerHTML = result;
+                outputLanguageComboBox.innerHTML = result;
+            });                           
+            
+            determineButton.onclick = function()
+            {
+                var text = inputTextArea.value;              
+                helper.tryProcess(function()
+                {
+                    translator.determineLanguage(text, function(result)
+                    {
+                        inputLanguageComboBox.value = result;
+                    });
+                });                                 
+            }
+            
+            translateButton.onclick = function()
+            {
+                if (outputLanguageComboBox.value == "empty")
+                {
+                    messageTextArea.value = "Пожалуйста, выберите язык перевода.";
+                }   
+                else
+                {
+                    var fromCode = inputLanguageComboBox.value;
+                    if (fromCode == "empty")
+                    {
+                        var text = inputTextArea.value;              
+                        helper.tryProcess(function()
+                        {
+                            translator.determineLanguage(text, function(result)
+                            {
+                                inputLanguageComboBox.value = result;
+                            });
+                        });    
+                        fromCode = inputLanguageComboBox.value;
+                    }
+                    messageTextArea.value = "";
+
+                    var text = inputTextArea.value;           
+                    var toCode = outputLanguageComboBox.value;
+
+                    helper.tryProcess(function()
+                    {
+                         translator.translate(text, fromCode, toCode, function(result)
+                        {
+                            outputTextArea.value = result;
+                        });
+                    });
+                }                
+            }
+        </script>
+    </body>
+</html>
