@@ -2,13 +2,18 @@ function YandexTranslator()
 {
     var serviceUrl = "https://translate.yandex.net/api/v1.5/tr.json/";
     var apiKey = getApiKey();   
-
+    
     function getApiKey() 
     {
         var nameEQ = "key=";
-        var key = document.cookie; 
-        
-        return key.substring(nameEQ.length, key.length);  
+        var eq = document.cookie; 
+        var key = eq.substring(nameEQ.length, eq.length);  
+        if (key == "") 
+        {
+            key = prompt("Please enter your api-key:", "");
+            document.cookie = "key=" + apiKey;
+        } 
+        return key;
     }
 
     function sendRequest(command, additionalQueries, processor)

@@ -9,7 +9,6 @@
             .downContainer .textBox { resize: none; outline: none; width: 90%; padding: 10px; height: 90%; }
         </style>
         <script type="text/javascript" src="YandexTranslator.js"></script>
-        <script type="text/javascript" src="Helper.js"></script>
         <title>Translator</title>
     </head>
     <body>  
@@ -34,10 +33,27 @@
         <output id="messageTextArea"></output>
 
         <script type="text/javascript">
-            var translator = new YandexTranslator();
-            var helper = new Helper();
-
-            if (translator.apiKey == "") helper.setApiKey();
+            function tryProcess(process)
+            {
+                try
+                {
+                    process();
+                }
+                catch(error)
+                {
+                    if (error.name == "TranslateException") 
+                    {
+                        messageTextArea.value = error.message;
+                    } 
+                    else if (error.name == "ApiException")
+                    {
+                        messageTextArea.value = error.message;
+                        setApiKey();
+                    }
+                    else throw error;
+                }  
+            }
+            var translator = new YandexTranslator();        
 
             translator.getSupportedLanguages(function(result)
             {   
@@ -48,7 +64,7 @@
             determineButton.onclick = function()
             {
                 var text = inputTextArea.value;              
-                helper.tryProcess(function()
+                tryProcess(function()
                 {
                     translator.determineLanguage(text, function(result)
                     {
@@ -69,7 +85,7 @@
                     if (fromCode == "empty")
                     {
                         var text = inputTextArea.value;              
-                        helper.tryProcess(function()
+                        tryProcess(function()
                         {
                             translator.determineLanguage(text, function(result)
                             {
@@ -83,7 +99,7 @@
                     var text = inputTextArea.value;           
                     var toCode = outputLanguageComboBox.value;
 
-                    helper.tryProcess(function()
+                    tryProcess(function()
                     {
                          translator.translate(text, fromCode, toCode, function(result)
                         {
