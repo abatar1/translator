@@ -11,7 +11,7 @@ function YandexTranslator()
         if (key == "") 
         {
             key = prompt("Please enter your api-key:", "");
-            document.cookie = "key=" + apiKey;
+            document.cookie = "key=" + key;
         } 
         return key;
     }
@@ -23,7 +23,7 @@ function YandexTranslator()
 
         httpRequest.open("GET", url, true);
         httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");     
-
+        
         httpRequest.onreadystatechange = function() 
         {
             switch(this.status)
@@ -62,10 +62,10 @@ function YandexTranslator()
 
     this.getSupportedLanguages = function(callback)
     {
-        sendRequest("getLangs", "&ui=ru", function(httpRequest)
+        sendRequest("getLangs", "&ui=ru", function(httpResponse)
         {
             var htmlSelect = "<option value=\"empty\" selected=\"selected\"</option>";
-            var langsJson = JSON.parse(httpRequest.responseText).langs;               
+            var langsJson = JSON.parse(httpResponse.responseText).langs;               
 
             for (var key in langsJson) 
             {
@@ -81,9 +81,9 @@ function YandexTranslator()
         var formattedText = formatText(text);
         var additionalQuery = "&text=" + formattedText;
 
-        sendRequest("detect", additionalQuery, function(httpRequest)
+        sendRequest("detect", additionalQuery, function(httpResponse)
         {
-            callback(JSON.parse(httpRequest.responseText).lang); 
+            callback(JSON.parse(httpResponse.responseText).lang); 
         });
     }
 
@@ -93,9 +93,9 @@ function YandexTranslator()
         var translationDir = fromCode + "-" + toCode;
         var additionalQuery = "&text=" + formattedText + "&lang=" + translationDir;
 
-        sendRequest("translate", additionalQuery, function(httpRequest)
+        sendRequest("translate", additionalQuery, function(httpResponse)
         {
-            callback(JSON.parse(httpRequest.responseText).text[0]); 
+            callback(JSON.parse(httpResponse.responseText).text[0]); 
         });
     }
 
